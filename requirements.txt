@@ -1,0 +1,9 @@
+ipykernel
+jupyter
+langgraph
+matplotlib
+nibabel
+numpy
+pandas
+snntorch
+torch
