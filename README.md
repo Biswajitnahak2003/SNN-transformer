@@ -18,8 +18,9 @@ This repository contains the code and Jupyter Notebooks for training a Spiking T
   - `02_dataloader_augmentation.ipynb`
   - `03_spiking_transformer_training.ipynb`
   - `04_llm_agentic_triage.ipynb`
-  - `05_llm_agentic_triage_error (3).ipynb`
+  - `05_full_training.ipynb`
   - `06_evaluation_comparisons.ipynb`
+  - `07_evaluation_custom_data.ipynb`
 - `main.py`: Entry point for the Spiking Transformer scripts.
 - `requirements.txt`: Project dependencies.
 - `pyproject.toml`: Python project configuration file.
