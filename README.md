@@ -119,14 +119,12 @@ The segmentation quality is demonstrated through precise tumor boundary detectio
 - Linear Complexity Attention: Enables high-resolution processing
 - Adaptive Temporal Control: Per-pixel timestep optimization
 
-### Comparison with Standard Approaches
+### Comparison with Standard SNN Approaches
 
 | Approach | Dice Score | HD95 | Energy Cost | Complexity |
 |----------|------------|------|-------------|------------|
 | Adaptive SNN (Ours) | **0.7410** | **2.412** | **75%** | O(Nd²) |
 | Static SNN (T=4) | ~0.7386 | ~2.45 | 100% | O(N²) |
-| CNN U-Net | ~0.7200 | ~2.80 | 100% | O(N²) |
-| Transformer | ~0.7350 | ~2.60 | 120% | O(N²) |
 
 *Energy cost relative to static SNN baseline. Lower HD95 indicates better edge precision.*
 
