@@ -7,3 +7,11 @@ numpy
 pandas
 snntorch
 torch
+transformers
+accelerate
+bitsandbytes
+scikit-learn
+scipy
+tqdm
+einops
+seaborn
