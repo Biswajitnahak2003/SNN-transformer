@@ -1,19 +1,19 @@
 # Adaptive Timestep SNN for Volumetric Brain Tumor Segmentation
 
-An energy-efficient Spiking Neural Network (SNN) combined with a dynamic uncertainty agent, applied to the **BraTS 2023 Glioma Segmentation Challenge**. This project drastically reduces computational overhead by spatially routing processing timesteps based on image complexity.
+An energy-efficient Spiking Neural Network (SNN) combined with a dynamic uncertainty agent, applied to the BraTS 2023 Glioma Segmentation Challenge. This project drastically reduces computational overhead by spatially routing processing timesteps based on image complexity.
 
-## 🏆 Key Achievements
+## Key Achievements
 
 <div align="center">
 
-### 🎯 **State-of-the-Art Performance**
-**Dice: 0.7410** | **HD95: 2.412** | **25.26% Energy Savings**
+**State-of-the-Art Performance**  
+Dice: 0.7410 | HD95: 2.412 | 25.26% Energy Savings
 
-### ⚡ **Efficiency Breakthrough**
-**81% Better Edge Precision** | **Adaptive Temporal Control** | **Linear Complexity Attention**
+**Efficiency Breakthrough**  
+81% Better Edge Precision | Adaptive Temporal Control | Linear Complexity Attention
 
-### 🧠 **Novel Architecture**
-**Spiking U-Net + Bipolar Attention + CNN Uncertainty Agent**
+**Novel Architecture**  
+Spiking U-Net + Bipolar Attention + CNN Uncertainty Agent
 
 </div>
 
@@ -103,27 +103,32 @@ Input MRI (128×128×4)
 | **CNNTimestepAgent** | Conv2d(8,32) → BN → ReLU → Conv2d(32,32) → BN → ReLU → Conv2d(32,1) → Sigmoid | Patch-level (8×8) pooling for efficiency |
 | **AdaptiveTimestepSNN** | Wraps SpikingUNet + temporal loop with per-pixel masking | Straight-through estimator for differentiability |
 
-## 📊 Results & Performance
+## Results & Performance
 
-### 🎯 Key Metrics
+### Key Metrics
 
 | Metric | Value | Improvement |
 |--------|-------|-------------|
-| **Dice Coefficient** | `0.7410` | +0.0024 vs baseline |
-| **Hausdorff Distance (HD95)** | `2.412` pixels | Superior edge precision |
-| **Energy Savings** | `25.26%` | Significant computational reduction |
-| **Training Time** | `~42 min/epoch` | 47% faster than standard |
+| Dice Coefficient | 0.7410 | +0.0024 vs baseline |
+| Hausdorff Distance (HD95) | 2.412 pixels | Superior edge precision |
+| Energy Savings | 25.26% | Significant computational reduction |
+| Training Time | ~42 min/epoch | 47% faster than standard |
 
-### 📈 Training Performance
+### Training Performance
 
 **20-Epoch Training Results on BraTS 2023 (1,251 patients):**
 
-- **Final Validation Dice**: `0.7410` (↑ from `0.722` at epoch 1)
-- **Best HD95**: `2.322` pixels (↓ from `3.151` at epoch 4)
-- **Stable Energy Savings**: `25.26%` average (activated after epoch 10)
+The model demonstrates steady improvement throughout training, with the adaptive timestep agent activating after epoch 10 to provide significant energy savings while maintaining segmentation accuracy.
+
+![Training Performance](Result/dice_curves.png)  
+*Dice coefficient progression showing stable convergence to 0.7410 final validation score*
+
+- **Final Validation Dice**: 0.7410 (↑ from 0.722 at epoch 1)
+- **Best HD95**: 2.322 pixels (↓ from 3.151 at epoch 4)
+- **Stable Energy Savings**: 25.26% average (activated after epoch 10)
 - **Convergence**: Achieved within 15 epochs with adaptive timestep routing
 
-### 🏆 Performance Highlights
+### Performance Highlights
 
 #### Adaptive Efficiency
 - **Phase 1 (Epochs 0-10)**: Fixed T=4 warmup for SNN stability
@@ -135,42 +140,25 @@ Input MRI (128×128×4)
 - **Stable Gradients**: Bipolar spiking neurons prevent vanishing gradients
 - **Memory Efficient**: Linear attention reduces complexity from O(N²) to O(Nd²)
 
-### 📊 Visual Results
+### Qualitative Results
 
-The `Result/` directory contains comprehensive visualizations:
+The segmentation quality is demonstrated through precise tumor boundary detection and accurate tissue classification across different MRI modalities.
 
-#### Training Curves
-![Dice Coefficient Training Curves](Result/dice_curves.png)
-*Dice coefficient progression over 20 epochs (train/validation)*
+![Segmentation Results](Result/samples.png)  
+*Sample predictions showing accurate tumor segmentation on validation data*
 
-![Loss Curves](Result/loss_curves.png)
-*Training and validation loss convergence*
+### Technical Achievements
 
-![Hausdorff Distance Tracking](Result/hd95.png)
-*HD95 metric improvement throughout training*
+- 81% Better HD95: Compared to static timestep SNNs
+- 25% Energy Reduction: Without sacrificing segmentation accuracy
+- Linear Complexity Attention: Enables high-resolution processing
+- Adaptive Temporal Control: Per-pixel timestep optimization
 
-![Energy Savings](Result/energy.png)
-*Energy savings activation after epoch 10*
-
-#### Qualitative Results
-![Sample Predictions](Result/samples.png)
-*Segmentation predictions on validation set*
-
-![Detailed Predictions](Result/sample_preds.png)
-*Detailed prediction visualizations with ground truth overlay*
-
-### 🔬 Technical Achievements
-
-- **81% Better HD95**: Compared to static timestep SNNs
-- **25% Energy Reduction**: Without sacrificing segmentation accuracy
-- **Linear Complexity Attention**: Enables high-resolution processing
-- **Adaptive Temporal Control**: Per-pixel timestep optimization
-
-### 📈 Comparison with Standard Approaches
+### Comparison with Standard Approaches
 
 | Approach | Dice Score | HD95 | Energy Cost | Complexity |
 |----------|------------|------|-------------|------------|
-| **Adaptive SNN (Ours)** | **0.7410** | **2.412** | **75%** | O(Nd²) |
+| Adaptive SNN (Ours) | **0.7410** | **2.412** | **75%** | O(Nd²) |
 | Static SNN (T=4) | ~0.7386 | ~2.45 | 100% | O(N²) |
 | CNN U-Net | ~0.7200 | ~2.80 | 100% | O(N²) |
 | Transformer | ~0.7350 | ~2.60 | 120% | O(N²) |
@@ -178,10 +166,6 @@ The `Result/` directory contains comprehensive visualizations:
 *Energy cost relative to static SNN baseline. Lower HD95 indicates better edge precision.*
 
 ---
-
-## 📂 Project Structure
-
-## 📂 Project Structure
 
 ## 📂 Project Structure
 
@@ -253,22 +237,22 @@ The `Result/` directory contains comprehensive visualizations:
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
-## 📚 Citation
+## Citation
 
 If you use this work in your research, please cite:
 
 ```bibtex
 @misc{adaptive_snn_brats2023,
   title={Adaptive Timestep Spiking Neural Network for Energy-Efficient Brain Tumor Segmentation},
-  author={Your Name},
+  author={Biswajit Nahak},
   year={2024},
   publisher={GitHub},
-  url={https://github.com/yourusername/spiking-transformer}
+  url={https://github.com/Biswajitnahak2003/SNN-transformer}
 }
 ```
 
-## 🔗 Related Work
+## Related Work
 
-- **BraTS Challenge**: [MICCAI BraTS 2023](https://www.synapse.org/Synapse:syn51156910/wiki/622351)
-- **SNNTorch**: Spiking Neural Network library used for LIF neurons
-- **Medical Imaging**: Focus on energy-efficient deep learning for healthcare
+- BraTS Challenge: MICCAI BraTS 2023
+- SNNTorch: Spiking Neural Network library used for LIF neurons
+- Medical Imaging: Focus on energy-efficient deep learning for healthcare
