@@ -19,13 +19,13 @@ graph TD
 
     H --> I[Final Segmentation Mask<br/>128×128×4 classes]
 
-    style A fill:#e1f5fe
-    style B fill:#f3e5f5
-    style C fill:#fff3e0
-    style D fill:#f3e5f5
-    style E fill:#e8f5e8
-    style F fill:#fff8e1
-    style G fill:#e8f5e8
-    style H fill:#ffebee
-    style I fill:#e1f5fe
+    style A fill:#e1f5fe,stroke:#0277bd,stroke-width:2px,color:#0277bd
+    style B fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#7b1fa2
+    style C fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#f57c00
+    style D fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#7b1fa2
+    style E fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px,color:#2e7d32
+    style F fill:#fff8e1,stroke:#f9a825,stroke-width:2px,color:#f9a825
+    style G fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px,color:#2e7d32
+    style H fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#c62828
+    style I fill:#e1f5fe,stroke:#0277bd,stroke-width:2px,color:#0277bd
 ```
