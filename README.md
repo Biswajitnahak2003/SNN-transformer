@@ -19,89 +19,54 @@ Spiking U-Net + Bipolar Attention + CNN Uncertainty Agent
 
 ---
 
-## 🧠 Approach & Architecture
+## Approach & Architecture
 
 Standard Spiking Neural Networks process information over a static number of time steps ($T$). While maintaining high $T$ leads to better temporal precision, it is incredibly energy-inefficient to run high timesteps on the empty, black backgrounds prevalent in medical MRIs.
 
-Our hybrid architecture solves this:
-1. **Spiking U-Net**: A heavily customized 4-stage U-Net utilizing **Leaky Integrate-and-Fire (LIF)** neurons and **Bipolar {-1, +1} Spiking States** for robust gradient backpropagation.
+Our hybrid architecture solves this through three key innovations:
+
+1. **Spiking U-Net**: A heavily customized 4-stage U-Net utilizing Leaky Integrate-and-Fire (LIF) neurons and Bipolar {-1, +1} Spiking States for robust gradient backpropagation.
 2. **Bipolar Linear Self-Attention**: A modified attention bottleneck that brings matrix computations down from $O(N^2)$ to $O(N)$ linear time, allowing for high-resolution processing on standard hardware.
 3. **CNN Uncertainty Agent**: A learnable convolutional agent that evaluates the entropy of the SNN's $t=1$ preliminary guess, paired with structural gradients, to dynamically deactivate background patches for subsequent timesteps ($t=2$ through $T=4$).
 
-### Forward Pass Pipeline
+### Architecture Overview
 
-```
-Input MRI (128×128×4)
-    │
-    ▼
-┌──────────────────────────────────────────────────────────────┐
-│                    SPIKING U-NET (t=1)                       │
-│                                                              │
-│  ENCODER                          DECODER                    │
-│  ┌──────────────┐                ┌──────────────┐            │
-│  │ SpikingConv   │ ─ ─ skip ─ ─▶ │ UpConv+Concat│            │
-│  │ 128×128×32    │                │ 128×128×16   │            │
-│  └──────┬───────┘                └──────▲───────┘            │
-│         │ MaxPool                       │ ConvTranspose2d     │
-│  ┌──────▼───────┐                ┌──────┴───────┐            │
-│  │ SpikingConv   │ ─ ─ skip ─ ─▶ │ UpConv+Concat│            │
-│  │ 64×64×64      │                │ 64×64×32     │            │
-│  └──────┬───────┘                └──────▲───────┘            │
-│         │ MaxPool                       │ ConvTranspose2d     │
-│  ┌──────▼───────┐                ┌──────┴───────┐            │
-│  │ SpikingConv   │ ─ ─ skip ─ ─▶ │ UpConv+Concat│            │
-│  │ 32×32×128     │                │ 32×32×64     │            │
-│  └──────┬───────┘                └──────▲───────┘            │
-│         │ MaxPool                       │ ConvTranspose2d     │
-│  ┌──────▼───────┐                ┌──────┴───────┐            │
-│  │ SpikingConv   │ ─ ─ skip ─ ─▶ │ UpConv+Concat│            │
-│  │ 16×16×256     │                │ 16×16×128    │            │
-│  └──────┬───────┘                └──────▲───────┘            │
-│         │ MaxPool                       │ ConvTranspose2d     │
-│         ▼                               │                    │
-│  ┌─────────────────────────────────────┐│                    │
-│  │   Bipolar Linear Self-Attention     ││                    │
-│  │   8×8×256  Q(K^T V) → O(Nd²)       │┘                    │
-│  └─────────────────────────────────────┘                     │
-└──────────────────────────────────────────────────────────────┘
-    │                           │
-    │ t=1 Logits                │ Original Image
-    ▼                           ▼
-┌──────────────────────────────────────────────────────────────┐
-│                CNN UNCERTAINTY AGENT                          │
-│                                                              │
-│  ┌────────┐   ┌────────┐   ┌─────────┐   ┌───────────────┐  │
-│  │ Conv2d │──▶│ Conv2d │──▶│ AvgPool │──▶│ Sigmoid → Map │  │
-│  │ 8→32   │   │ 32→32  │   │ Patches │   │ T=1 or T=4    │  │
-│  └────────┘   └────────┘   └─────────┘   └───────────────┘  │
-│                                                              │
-│  Entropy (SNN Confusion) + Gradient (Edges) = Uncertainty    │
-└──────────────────────────────────────────────────────────────┘
-    │
-    │ Timestep Map (B, H, W) with values ∈ {1, 4}
-    ▼
-┌──────────────────────────────────────────────────────────────┐
-│              ADAPTIVE TEMPORAL CONTROLLER                     │
-│                                                              │
-│  For t = 2, 3, 4:                                            │
-│    • Background pixels (T=1): DEACTIVATED — zero multiply    │
-│    • Tumor pixels (T=4):      ACTIVE — full SNN forward      │
-│                                                              │
-│  Final Output = Σ(logits × active_mask) / count_per_pixel    │
-└──────────────────────────────────────────────────────────────┘
-    │
-    ▼
-  Output Segmentation Mask (128×128×4 classes)
+```mermaid
+graph TD
+    A[Input MRI<br/>128×128×4] --> B[Spiking U-Net<br/>4-stage Encoder]
+    B --> C[Bipolar Linear<br/>Self-Attention<br/>8×8×256]
+    C --> D[4-stage Decoder<br/>with Skip Connections]
+    D --> E[t=1 Preliminary<br/>Segmentation]
+    
+    E --> F[CNN Uncertainty Agent<br/>Entropy + Gradients]
+    A --> F
+    
+    F --> G[Adaptive Timestep Map<br/>T=1 or T=4 per pixel]
+    
+    G --> H[Adaptive Temporal Controller]
+    D --> H
+    
+    H --> I[Final Segmentation Mask<br/>128×128×4 classes]
+    
+    style A fill:#e1f5fe
+    style B fill:#f3e5f5
+    style C fill:#fff3e0
+    style D fill:#f3e5f5
+    style E fill:#e8f5e8
+    style F fill:#fff8e1
+    style G fill:#e8f5e8
+    style H fill:#ffebee
+    style I fill:#e1f5fe
 ```
 
 ### Internal Block Details
 
 | Block | Internal Layers | Key Feature |
 |-------|----------------|-------------|
-| **SpikingConvBlock** | Conv2d → BN → LIF → Conv2d → BN → LIF | Binary spikes {-1, +1} via fast-sigmoid surrogate |
-| **BipolarLinearAttention** | Q/K/V projections → LIF → Bipolar encoding → Linear `Q(K^TV)` | O(Nd²) complexity instead of O(N²d) |
-| **CNNTimestepAgent** | Conv2d(8,32) → BN → ReLU → Conv2d(32,32) → BN → ReLU → Conv2d(32,1) → Sigmoid | Patch-level (8×8) pooling for efficiency |
-| **AdaptiveTimestepSNN** | Wraps SpikingUNet + temporal loop with per-pixel masking | Straight-through estimator for differentiability |
+| SpikingConvBlock | Conv2d → BN → LIF → Conv2d → BN → LIF | Binary spikes {-1, +1} via fast-sigmoid surrogate |
+| BipolarLinearAttention | Q/K/V projections → LIF → Bipolar encoding → Linear Q(K^T V) | O(Nd²) complexity instead of O(N²d) |
+| CNNTimestepAgent | Conv2d(8,32) → BN → ReLU → Conv2d(32,32) → BN → ReLU → Conv2d(32,1) → Sigmoid | Patch-level (8×8) pooling for efficiency |
+| AdaptiveTimestepSNN | Wraps SpikingUNet + temporal loop with per-pixel masking | Straight-through estimator for differentiability |
 
 ## Results & Performance
 
