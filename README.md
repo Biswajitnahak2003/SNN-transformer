@@ -213,9 +213,3 @@ If you use this work in your research, please cite:
   url={https://github.com/Biswajitnahak2003/SNN-transformer}
 }
 ```
-
-## Related Work
-
-- BraTS Challenge: MICCAI BraTS 2023
-- SNNTorch: Spiking Neural Network library used for LIF neurons
-- Medical Imaging: Focus on energy-efficient deep learning for healthcare
