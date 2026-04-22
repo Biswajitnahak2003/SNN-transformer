@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "adaptive-snn-brain-tumor"
+version = "1.0.0"
+description = "Adaptive Timestep Spiking Neural Network for Energy-Efficient Brain Tumor Segmentation"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Biswajit Nahak", email = "biswajitnahakbn2003@gmail.com"}
+]
+keywords = ["spiking-neural-networks", "medical-imaging", "brain-tumor-segmentation", "deep-learning", "pytorch"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Medical Science Apps."
+]
+requires-python = ">=3.8"
+dependencies = [
+    "torch>=2.0.0",
+    "torchvision",
+    "snntorch>=0.6.0",
+    "numpy",
+    "scipy",
+    "scikit-learn",
+    "matplotlib",
+    "seaborn",
+    "tqdm",
+    "nibabel",
+    "pandas",
+    "accelerate",
+    "transformers",
+    "einops",
+    "jupyter",
+    "ipykernel"
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/adaptive-snn-brain-tumor"
+Repository = "https://github.com/yourusername/adaptive-snn-brain-tumor"
+Issues = "https://github.com/yourusername/adaptive-snn-brain-tumor/issues"
+Documentation = "https://github.com/yourusername/adaptive-snn-brain-tumor#readme"
+
+[project.scripts]
+adaptive-snn-train = "src.train:main"
+adaptive-snn-infer = "src.inference:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.setuptools.package-data]
+"src" = ["*.py"]

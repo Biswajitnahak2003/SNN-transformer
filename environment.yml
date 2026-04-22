@@ -1,0 +1,28 @@
+name: adaptive-snn
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python>=3.8
+  - pytorch>=2.0.0
+  - torchvision
+  - torchaudio
+  - cudatoolkit=11.8  # Remove if no GPU
+  - pip
+  - pip:
+    - snntorch>=0.6.0
+    - numpy
+    - scipy
+    - scikit-learn
+    - matplotlib
+    - seaborn
+    - tqdm
+    - nibabel
+    - pandas
+    - accelerate
+    - transformers
+    - einops
+    - jupyter
+    - ipykernel
+    - python-pptx  # For presentation generation
