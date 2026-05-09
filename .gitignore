@@ -115,6 +115,9 @@ spiking-env/
 .spyderproject
 .spyproject
 
+# Local report exports
+academic_report[1].pdf
+
 # Rope project settings
 .ropeproject
 
