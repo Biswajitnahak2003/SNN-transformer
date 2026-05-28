@@ -13,7 +13,7 @@ Dice: 0.7410 | HD95: 2.412 | 25.26% Energy Savings
 81% Better Edge Precision | Adaptive Temporal Control | Linear Complexity Attention
 
 **Novel Architecture**  
-Spiking U-Net + Bipolar Attention + CNN Uncertainty Agent
+Spiking Vision Transformer (SpikingViT) + Bipolar Attention + CNN Uncertainty Agent
 
 </div>
 
@@ -25,48 +25,26 @@ Standard Spiking Neural Networks process information over a static number of tim
 
 Our hybrid architecture solves this through three key innovations:
 
-1. **Spiking U-Net**: A heavily customized 4-stage U-Net utilizing Leaky Integrate-and-Fire (LIF) neurons and Bipolar {-1, +1} Spiking States for robust gradient backpropagation.
-2. **Bipolar Linear Self-Attention**: A modified attention bottleneck that brings matrix computations down from $O(N^2)$ to $O(N)$ linear time, allowing for high-resolution processing on standard hardware.
+1. **Spiking Vision Transformer (SpikingViT)**: A neuromorphic vision transformer utilizing 16x16 patch embeddings, learned positional embeddings, and a cascade of 6 Transformer Blocks employing Leaky Integrate-and-Fire (LIF) neurons and Bipolar {-1, +1} Spiking States.
+2. **Bipolar Linear Self-Attention**: A modified attention mechanism that uses bipolar {-1, +1} spikes and a linear attention form $O(N d^2)$ rather than standard $O(N^2 d)$ quadratic self-attention, allowing dense, efficient patch-wise token processing on standard hardware.
 3. **CNN Uncertainty Agent**: A learnable convolutional agent that evaluates the entropy of the SNN's $t=1$ preliminary guess, paired with structural gradients, to dynamically deactivate background patches for subsequent timesteps ($t=2$ through $T=4$).
 
 ### Architecture Overview
 
-```mermaid
-graph TD
-    A[Input MRI<br/>128×128×4] --> B[Spiking U-Net<br/>4-stage Encoder]
-    B --> C[Bipolar Linear<br/>Self-Attention<br/>8×8×256]
-    C --> D[4-stage Decoder<br/>with Skip Connections]
-    D --> E[t=1 Preliminary<br/>Segmentation]
-    
-    E --> F[CNN Uncertainty Agent<br/>Entropy + Gradients]
-    A --> F
-    
-    F --> G[Adaptive Timestep Map<br/>T=1 or T=4 per pixel]
-    
-    G --> H[Adaptive Temporal Controller]
-    D --> H
-    
-    H --> I[Final Segmentation Mask<br/>128×128×4 classes]
-    
-    style A fill:#e1f5fe,stroke:#0277bd,stroke-width:2px,color:#0277bd
-    style B fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#7b1fa2
-    style C fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#f57c00
-    style D fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#7b1fa2
-    style E fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px,color:#2e7d32
-    style F fill:#fff8e1,stroke:#f9a825,stroke-width:2px,color:#f9a825
-    style G fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px,color:#2e7d32
-    style H fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#c62828
-    style I fill:#e1f5fe,stroke:#0277bd,stroke-width:2px,color:#0277bd
-```
+![Proposed Architecture](Result/architecture.png)
+
+*The proposed neuromorphic SNN-Transformer architecture showcasing patch embedding, Spiking Vision Transformer Blocks (MSA + MLP), CNN Uncertainty Agent, and Adaptive Timestep Routing.*
 
 ### Internal Block Details
 
-| Block | Internal Layers | Key Feature |
-|-------|----------------|-------------|
-| SpikingConvBlock | Conv2d → BN → LIF → Conv2d → BN → LIF | Binary spikes {-1, +1} via fast-sigmoid surrogate |
-| BipolarLinearAttention | Q/K/V projections → LIF → Bipolar encoding → Linear Q(K^T V) | O(Nd²) complexity instead of O(N²d) |
-| CNNTimestepAgent | Conv2d(8,32) → BN → ReLU → Conv2d(32,32) → BN → ReLU → Conv2d(32,1) → Sigmoid | Patch-level (8×8) pooling for efficiency |
-| AdaptiveTimestepSNN | Wraps SpikingUNet + temporal loop with per-pixel masking | Straight-through estimator for differentiability |
+| Block / Component | Internal Layers / Operations | Key Feature |
+|-------------------|-----------------------------|-------------|
+| **SpikingViT** | Conv2d Patchify → Positional Embed → 6× Transformer Blocks → Nearest Upsample → 1×1 Head | Full ViT-based spiking segmentation model |
+| **TransformerBlock** | Norm1 → BipolarLinearAttention → Norm2 → SpikingMLP | Spiking transformer layer with skip connections |
+| **BipolarLinearAttention** | Q/K/V projections → LIF → Bipolar encoding → Linear Q(K^T V) | $O(Nd^2)$ complexity instead of $O(N^2d)$ |
+| **SpikingMLP** | FC1 → LIF1 → FC2 → LIF2 | Two-layer spiking MLP block |
+| **CNNTimestepAgent** | Conv2d(8,32) → BN → ReLU → Conv2d(32,32) → BN → ReLU → Conv2d(32,1) → Sigmoid | Patch-level (16×16) pooling for efficiency |
+| **AdaptiveTimestepSNN** | Wraps SpikingViT + temporal loop with patch-level masking | Straight-through estimator for differentiability |
 
 ## Results & Performance
 
@@ -139,10 +117,10 @@ The segmentation quality is demonstrated through precise tumor boundary detectio
 │   ├── agent.py                     # CNN Timestep Agent logic
 │   ├── dataset.py                   # BraTS 128x128 axial dataloader & augmentations
 │   ├── metrics.py                   # Custom Dice, HD95, and Energy Tracker classes
-│   ├── snn_model.py                 # Spiking U-Net and Bipolar Attention architecture
+│   ├── snn_model.py                 # Spiking Vision Transformer and Bipolar Attention architecture
 │   ├── train.py                     # Multi-GPU Accelerate training loop
 │   ├── utils.py                     # Visualizer and checkpoint plotting tools
-├── Result/                          # Training results, metrics, and visualizations
+├── Result/                          # Training results, metrics, visualizations, and architecture diagram
 ├── dataset/                         # BraTS 2023 glioma dataset (sample subset)
 ├── spiking-env/                     # Python virtual environment
 ├── requirements.txt                 # Minimum viable dependencies
